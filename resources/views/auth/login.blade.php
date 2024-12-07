@@ -86,5 +86,4 @@
 
 @push('js')
 <script src="{{ asset('frontend/js/checkout.js')}}"></script>
-
 @endpush

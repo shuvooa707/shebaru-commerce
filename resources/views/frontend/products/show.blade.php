@@ -113,10 +113,12 @@
 
 
 
+
                                     @endif
 
                                     @if($product->discount_type)
                                         <span class="price old-price" style="font-size:16px;margin-left:10px;background: #0064D2;padding:4px;color:#fff">{{$product->discount}} {{$product->discount_type=='fixed'?'া':'%'}} OFF </span>
+
 
 
 
@@ -185,7 +187,8 @@
                                         </div>
                                         @if($product->vendor)
                                             <div>
-                                                <small class="underline" style="text-decoration: underline;">Vendor:</small>
+                                                <small class="underline"
+                                                       style="text-decoration: underline;">Vendor:</small>
                                                 <a href="{{ route('front.products.index') }}?vendor_id={{$product->vendor->id}}"> {{ $product->vendor->name ?? "--" }}</a>
                                             </div>
                                         @endif
@@ -206,8 +209,7 @@
                                         @csrf
 
                                         @if($product->type=='single')
-                                            <input type="hidden" name="variation_id"
-                                                   value="{{ $product->variation->id}}">
+                                            <input type="hidden" name="variation_id" value="{{ $product->variation->id}}">
                                         @else
                                             <div class="product-variations-wrapper">
                                                 <div class="product-variation product-size-variation">
@@ -342,26 +344,26 @@
                                 @endif
                                 @if($product->vendor->facebook_link ?? null)
                                     <div class="col-lg-1">
-                                    <a href="{{$product->vendor->facebook_link}}">
-                                        <img width="50px" height="50px"
-                                             src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Facebook_Logo_2023.png"
-                                             alt="">
-                                    </a>
-                                </div>
+                                        <a href="{{$product->vendor->facebook_link}}">
+                                            <img width="50px" height="50px"
+                                                 src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Facebook_Logo_2023.png"
+                                                 alt="">
+                                        </a>
+                                    </div>
                                 @endif
                                 @if($product->vendor->phone ?? null)
-                                <div class="col-lg-8 my-3">
-                                    <i class="flaticon-phone"></i>
-                                    <div class="product-action-wrapper phone-box d-flex-center first"
-                                         style="background:#3167EB;border-radius: 5px;padding: 10px 30px;margin-bottom: 10px;">
-                                        <div class="inner_div" style="margin: 0 auto;">
-                                            <a href="tel: {{$product->vendor->phone}}"
-                                               style="color: white;display: flex; align-items:center">
-                                                <i class='fas fa-phone-alt mx-3'></i>
-                                                <span>{{ $product->vendor->phone }}</span></a>
+                                    <div class="col-lg-8 my-3">
+                                        <i class="flaticon-phone"></i>
+                                        <div class="product-action-wrapper phone-box d-flex-center first"
+                                             style="background:#3167EB;border-radius: 5px;padding: 10px 30px;margin-bottom: 10px;">
+                                            <div class="inner_div" style="margin: 0 auto;">
+                                                <a href="tel: {{$product->vendor->phone}}"
+                                                   style="color: white;display: flex; align-items:center">
+                                                    <i class='fas fa-phone-alt mx-3'></i>
+                                                    <span>{{ $product->vendor->phone }}</span></a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 @endif
                             </div>
 

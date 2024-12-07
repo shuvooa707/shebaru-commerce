@@ -70,10 +70,11 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $data = request()
-            ->validate([
-                "email" => "required",
-                "password" => "required"
-            ]);
+                    ->validate([
+                        "email" => "required",
+                        "password" => "required"
+                    ]);
+
 
         if (Auth::attempt($data)) {
             if (auth()->user()->type == '1') {
@@ -81,11 +82,17 @@ class AuthController extends Controller
             }
             session()->put('user_data', []);
         } else {
-            return redirect()->back();
+            return response()->json([
+                "msg" => "Incorrect Credentials",
+                "success" => false
+            ]);
         }
 
 
-        return redirect("/");
+        return response()->json([
+            "url" => route("front.home"),
+            "success" => true
+        ]);
     }
 
     public function getOpt()
