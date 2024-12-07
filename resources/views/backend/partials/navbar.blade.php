@@ -56,6 +56,15 @@
                 </li>
               	@endif
 
+              	@if(true || auth()->user()->can('vendor.view'))
+                <li class="">
+                    <a href="{{ route('admin.vendors.index')}}" class="">
+                        <i class="uil-folder-plus"></i>
+                        <span> Vendors Manage </span>
+                    </a>
+                </li>
+              	@endif
+
             	@if(auth()->user()->can('category.view'))
                 <li class="">
                     <a href="{{ route('admin.categories.index')}}" class="">
@@ -179,6 +188,12 @@
                         </a>
                     </li>
               		@endif
+                    <li class="">
+                        <a href="{{ route('admin.featured-sliders.index')}}" class="">
+                            <i class="uil-folder-plus"></i>
+                            <span> Homepage Featured Items </span>
+                        </a>
+                    </li>
 
               		@if(auth()->user()->can('image.view'))
                     <li class="">

@@ -24,6 +24,7 @@
                 <div class="col-md-6"><strong>Purchase  Price :</strong> {{$product->purchase_price}}</div>
                 <div class="col-md-6"><strong>Selling Price :</strong> {{$product->sell_price}}</div>
                 <div class="col-md-6"><strong>Color :</strong> {{$product->color}}</div>
+                <div class="col-md-6"><strong>Vendor :</strong> {{$product->vendor?->name ?? ""}}</div>
             </div>
             <hr>
              <div class="row mb-3">
@@ -33,18 +34,18 @@
                     <img src="{{ getImage('products',$product->image)}}" height=200 width=200>
                 </div>
                 @endif
-                
 
-                @foreach ($product->images as $key => $image) 
+
+                @foreach ($product->images as $key => $image)
                 <div class="col-md-3">
-                    <strong><strong>Multi Image : <a href="{{ route('admin.deleteImage',[$image->id])}}" class="btn btn-sm btn-danger" onclick="return confirm(' you want to delete?');">Delete</a></strong><br> 
+                    <strong><strong>Multi Image : <a href="{{ route('admin.deleteImage',[$image->id])}}" class="btn btn-sm btn-danger" onclick="return confirm(' you want to delete?');">Delete</a></strong><br>
                     <img src="{{ getImage('products',$image->image)}}" height="200" width="200">
                 </div>
                 @endforeach
             </div>
-             @if($product->description) 
-             
-            
+             @if($product->description)
+
+
                 <strong>Product Description : </strong>{{$product->description}}
              </div>
              @endif
@@ -52,13 +53,13 @@
              <div>
                 <strong>Body : </strong>{!!$product->body!!}
              </div>
-            @endif 
+            @endif
 
             @if($product->feature)
              <div>
                 <strong>Feature : </strong>{!!$product->feature!!}
              </div>
-            @endif 
+            @endif
             @if($product->discount_type)
              <div>
                 <strong>Discount Type : </strong>{{$product->discount_type}}
@@ -73,15 +74,15 @@
              <div>
                 <strong>After Discount : </strong>{{$product->after_discount}}
              </div>
-            @endif 
+            @endif
         </div>
 
     </div>
-</div>  
 </div>
-</div> 
+</div>
+</div>
 <hr>
-<!-- end page title --> 
+<!-- end page title -->
 
 <div class="row">
     <div class="col-12">
@@ -89,10 +90,10 @@
             <div class="card-body">
                 <div class="row mb-2">
                     <div class="col-xl-8">
-                                                  
+
                     </div>
                     <div class="col-xl-4">
-                        <div class="text-xl-end mt-xl-0 mt-2"> 
+                        <div class="text-xl-end mt-xl-0 mt-2">
                         </div>
                     </div><!-- end col-->
                 </div>
@@ -123,4 +124,4 @@
         </div> <!-- end card-->
     </div> <!-- end col -->
 </div> <!-- end row -->
-@endsection 
+@endsection

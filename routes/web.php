@@ -28,7 +28,7 @@ Route::group(['as' => 'front.'], function () {
         Route::post('/user-login', 'login')->name('login');
         Route::get('/seller-register', 'sellerRegister')->name('sellerRegister');
         Route::post('/seller-register-post', 'sellerRegisterPost')->name('sellerRegisterPost');
-        Route::post('/user-register', 'Register')->name('register');
+        Route::post('/user-register', 'register')->name('register');
 
         Route::get('/get-otp', 'getOpt')->name('getOpt');
         Route::post('/otp-verify', 'optVerify')->name('optVerify');

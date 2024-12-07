@@ -31,28 +31,34 @@ class ProductReviewController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $data=$request->validate([
+        $data = $request->validate([
             'review' => 'required|numeric',
-          	'name' => 'required',
-          	'message' => 'required',
-          	'product_id' => 'required|numeric',
+            'name' => 'required',
+            'message' => 'required',
+            'product_id' => 'required|numeric',
         ]);
-      	$old_check=['user_id'=>auth()->user()->id,'product_id'=>$data['product_id']];
-      	unset($data['product_id']);
-      	
-     	ProductReview::updateOrCreate($old_check,$data);
-      return response()->json(['success'=>true,'msg'=>'Product Review Is Created successfully!']);
+
+        $old_check = [
+            'user_id' => auth()->user()->id,
+            'product_id' => $data['product_id']
+        ];
+
+        unset($data['product_id']);
+
+        ProductReview::updateOrCreate($old_check, $data);
+
+        return response()->json(['success' => true, 'msg' => 'Product Review Is Created successfully!']);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -63,7 +69,7 @@ class ProductReviewController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -74,8 +80,8 @@ class ProductReviewController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -86,7 +92,7 @@ class ProductReviewController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

@@ -13,7 +13,7 @@
                         <div class="card-body signin-body" style="border-radius: 0;">
                         <div class="axil-checkout-billing">
                             <h2 class="serif text-center">Sign UP</h2>
-                            
+
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="form-group">
@@ -36,7 +36,7 @@
 
                             <div class="form-group">
                                 <label>Phone <span>*</span></label>
-                                <input type="tel" id="phone" name="mobile">
+                                <input type="tel" id="phone" name="phone">
                             </div>
 
                             <div class="form-group">
@@ -55,22 +55,22 @@
                                 <input type="password" name="password_confirmation" placeholder="Re-Enter Password Here">
                             </div>
 
-                            
+
 
                             <div class="d-flex justify-content-between">
                               <a href="{{ route('password.request') }}" class="font-m-sm text-muted" style="text-decoration: underline;">Forgot Password</a>
                             </div>
 
 
-                            
-                            
+
+
                             <div class="form-group">
                                 <button type="submit" class="p-3 border col-12 mt-2" style="background-color: #041e3a; color: white;">Create Account</button>
                             </div>
                         </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </form>
         </div>

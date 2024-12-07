@@ -53,23 +53,27 @@
                                 <div class="icon-logo">
                                     <i class="fas fa-mobile-alt"></i>
                                 </div>
-                                <h3 class="serif text-center">Provide your phone number</h3>
+                                <h3 class="serif text-center">Login</h3>
                             </div>
-                            
+
                             <div class="input-form px-3">
                                 <div class="form-group">
-                                    <label>Sign In / Sign Up With Your Phone Number * <span>*</span></label>
-                                    <input type="text" name="phone">
+                                    <label>Email<span>*</span></label>
+                                    <input type="text" name="email">
                                 </div>
-                                
+                                <div class="form-group">
+                                    <label>Password * <span>*</span></label>
+                                    <input type="password" name="password">
+                                </div>
+
                                 <div class="form-group">
                                     <button type="submit" class="p-3 border col-12 mt-2" style="background-color: #c2050b; color: white;">Sign In</button>
                                 </div>
+                                <a href="{{ route("register") }}" class="text-primary">Create New Account </a>
                             </div>
-                            
                         </div>
                     </div>
-                    
+
                 </div>
             </form>
         </div>

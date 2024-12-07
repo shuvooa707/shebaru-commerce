@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Vendor;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Combo;
@@ -18,72 +19,78 @@ use App\Models\Variation;
 
 class ProductController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         if ($request->ajax()) {
+            $q = request('q');
+            $type_id = request('brand_id');
+            $cat_id = request('cat_id');
+            $size_id = request('size_id');
+            $vendor_id = request('vendor_id');
+            $shorting = request('shorting');
 
-            $q=request('q');
-            $type_id=request('brand_id');
-            $cat_id=request('cat_id');
-            $size_id=request('size_id');
-            $shorting=request('shorting');
+            $query = Product::with('variation')
+                            ->Leftjoin('categories as c', 'c.id', 'products.category_id')
+                            ->Leftjoin('variations as v', 'v.product_id', 'products.id')
+                            ->select('products.id', 'products.name', 'products.type', 'products.purchase_price', 'products.regular_price', 'products.sell_price', 'products.image', 'is_stock', 'products.discount', 'products.discount_type', 'products.category_id', 'products.after_discount', 'products.dicount_amount');
+            if (!empty($cat_id)) {
+                $query->whereIn('products.category_id', $cat_id);
+            }
 
-            $query=Product::with('variation')
-                        ->Leftjoin('categories as c','c.id','products.category_id')
-                        ->Leftjoin('variations as v','v.product_id','products.id')
-                        ->select('products.id','products.name','products.type','products.purchase_price','products.regular_price','products.sell_price','products.image','is_stock','products.discount','products.discount_type','products.category_id','products.after_discount','products.dicount_amount');
-            if(!empty($cat_id)){
-                $query->whereIn('products.category_id',$cat_id);
-            } 
+            if (!empty($type_id)) {
+                $query->where('products.type_id', $type_id);
+            }
 
-            if(!empty($type_id)){
-                $query->where('products.type_id',$type_id);
-            } 
+            if (!empty($size_id)) {
+                $query->whereIn('v.size_id', $size_id);
+            }
 
-            if(!empty($size_id)){
-                $query->whereIn('v.size_id',$size_id);
-            } 
-            
-            if(!empty($q)){
-                $query->where(function($row) use ($q){
-                    $row->where('products.name','Like','%'.$q.'%');
-                    $row->orwhere('products.description','Like','%'.$q.'%');
+            if (!empty($vendor_id)) {
+                $query->whereIn('vendor_id', $vendor_id);
+            }
+
+            if (!empty($q)) {
+                $query->where(function ($row) use ($q) {
+                    $row->where('products.name', 'Like', '%' . $q . '%');
+                    $row->orwhere('products.description', 'Like', '%' . $q . '%');
                 });
             }
 
-            if(!empty($shorting)){
+            if (!empty($shorting)) {
 
-                if ($shorting=='desc') {
+                if ($shorting == 'desc') {
                     $query->orderBy('products.id', 'desc');
-                }else if ($shorting=='asc') {
+                } else if ($shorting == 'asc') {
                     $query->orderBy('products.id', 'asc');
-                }else if ($shorting=='name') {
+                } else if ($shorting == 'name') {
                     $query->orderBy('products.name', 'asc');
-                }else if ($shorting=='price_low') {
+                } else if ($shorting == 'price_low') {
                     $query->orderBy('products.sell_price', 'asc');
-                }else if ($shorting=='price_high') {
+                } else if ($shorting == 'price_high') {
                     $query->orderBy('products.sell_price', 'desc');
                 }
-                
-            } 
 
-            $items=$query->groupBy('products.id','products.name','products.is_free_shipping','products.type','products.purchase_price','products.regular_price','products.sell_price','products.image','is_stock','products.discount','products.discount_type','products.category_id','products.after_discount','products.dicount_amount')
-            ->paginate(30);
+            }
+
+            $items = $query->groupBy('products.id', 'products.name', 'products.is_free_shipping', 'products.type', 'products.purchase_price', 'products.regular_price', 'products.sell_price', 'products.image', 'is_stock', 'products.discount', 'products.discount_type', 'products.category_id', 'products.after_discount', 'products.dicount_amount')->paginate(30);
 
             return view('frontend.products.index_data', compact('items'))->render();
         }
 
 
-        $types=Type::orderBy('name')->get();
-        $cats=Category::whereNull('parent_id')->get();
-        $sizes=Size::all();
-        return view('frontend.products.index', compact('cats','sizes','types'));
+        $types = Type::orderBy('name')->get();
+        $cats = Category::whereNull('parent_id')->get();
+        $sizes = Size::all();
+        $vendors = Vendor::all();
+        return view('frontend.products.index', compact('cats', 'sizes', 'types', 'vendors'));
     }
-    
-    public function comboProducts (){
-        
-        $items=Combo::with('product')->paginate(30);
+
+    public function comboProducts()
+    {
+
+        $items = Combo::with('product')->paginate(30);
         return view('frontend.products.combo', compact('items'));
-        
+
     }
 
     public function show($id)
@@ -92,161 +99,169 @@ class ProductController extends Controller
         $recent_product = session()->get('recent_product', []);
 
         // dd($recent_product);
-  
-        if(!in_array($id,$recent_product)) {
-           array_push($recent_product,$id);
-           session()->put('recent_product', $recent_product);
-        } 
 
-        $product=Product::with('sizes')->find($id);
-        $products=Product::where('id','!=',$id)->where('category_id', $product->category_id)->take(4)->get();
+        if (!in_array($id, $recent_product)) {
+            array_push($recent_product, $id);
+            session()->put('recent_product', $recent_product);
+        }
 
-        return view('frontend.products.show', compact('product','products'));
-    }
-  
-  	public function relativeProduct($id){
+        $product = Product::with('sizes')->find($id);
+        $products = Product::where('id', '!=', $id)->where('category_id', $product->category_id)->take(4)->get();
 
-        $product = Product::with('sizes','sizes.stocks')->find($id);
-
-        $products=Product::with('variation')
-                
-                ->select('products.id','products.name','products.is_free_shipping','products.type','products.purchase_price','products.regular_price','products.sell_price','products.image','is_stock','products.category_id','products.discount_type','products.discount','products.after_discount','products.dicount_amount')
-                ->where('products.sub_category_id', $product->sub_category_id)
-                ->whereNotIn('products.id', [$id])
-                ->take(12)
-                ->get();
-        $view=view('frontend.products.partials.relative_product', compact('products'))->render();
-
-        return response()->json(['success'=>true,'html'=>$view]);
-
+        return view('frontend.products.show', compact('product', 'products'));
     }
 
-    public function trendingProduct(){
-      
-       $info = Information::first();
-       $newarrival_num = $info->newarrival_num; 
+    public function relativeProduct($id)
+    {
 
-        $products=Product::with('variation')
-                ->whereNull('products.discount_type')
-                ->select('products.id','products.name','products.is_free_shipping','products.type','products.purchase_price','products.regular_price','products.sell_price','products.image','is_stock','products.category_id','products.discount_type','products.discount','products.after_discount','products.dicount_amount')
-                ->latest()
-                ->take($newarrival_num)
-                ->get();
+        $product = Product::with('sizes', 'sizes.stocks')->find($id);
 
-        $view=view('frontend.products.partials.trending_product', compact('products'))->render();
+        $products = Product::with('variation')
+            ->select('products.id', 'products.name', 'products.is_free_shipping', 'products.type', 'products.purchase_price', 'products.regular_price', 'products.sell_price', 'products.image', 'is_stock', 'products.category_id', 'products.discount_type', 'products.discount', 'products.after_discount', 'products.dicount_amount')
+            ->where('products.sub_category_id', $product->sub_category_id)
+            ->whereNotIn('products.id', [$id])
+            ->take(12)
+            ->get();
+        $view = view('frontend.products.partials.relative_product', compact('products'))->render();
 
-        return response()->json(['success'=>true,'html'=>$view]);
+        return response()->json(['success' => true, 'html' => $view]);
 
     }
 
-    public function hotdealProduct(){
-      
-      $info = Information::first();
-        $discount_num = $info->discount_num;  
-      
-        $products=Product::with('variation')
-                ->whereNotNull('products.discount_type')
-                ->select('products.id','products.name','products.is_free_shipping','products.type','products.purchase_price','products.regular_price','products.sell_price','products.image','is_stock','products.category_id','products.discount_type','products.discount','products.after_discount','products.dicount_amount')
-                ->take($discount_num)->get();
-        $view=view('frontend.products.partials.hotdeal_product', compact('products'))->render();
-        return response()->json(['success'=>true,'html'=>$view]);
+    public function trendingProduct()
+    {
 
-    }
-
-    public function recommendedProduct(){
-      
         $info = Information::first();
-        $recom_num = $info->recommend_num;   
+        $newarrival_num = $info->newarrival_num;
 
-        $products=Product::with('variation')
-                ->whereNull('products.discount_type')
-                ->whereNotNull('products.is_recommended')
-                ->select('products.id','products.name','products.is_free_shipping','products.type','products.purchase_price','products.regular_price','products.sell_price','products.image','is_stock','products.category_id','products.discount_type','products.discount','products.after_discount','products.dicount_amount')
-                ->take($recom_num)
-                ->get();
-        $view=view('frontend.products.partials.recommended_product', compact('products'))->render();
+        $products = Product::with('variation')
+            ->whereNull('products.discount_type')
+            ->select('products.id', 'products.name', 'products.is_free_shipping', 'products.type', 'products.purchase_price', 'products.regular_price', 'products.sell_price', 'products.image', 'is_stock', 'products.category_id', 'products.discount_type', 'products.discount', 'products.after_discount', 'products.dicount_amount')
+            ->latest()
+            ->take($newarrival_num)
+            ->get();
 
-        return response()->json(['success'=>true,'html'=>$view]);
+        $view = view('frontend.products.partials.trending_product', compact('products'))->render();
+
+        return response()->json(['success' => true, 'html' => $view]);
 
     }
 
-    public function discountProduct(Request $request){
+    public function hotdealProduct()
+    {
 
-            if ($request->ajax()) {
-                $items=Product::with('variation')
-                    ->whereNotNull('products.discount_type')
-                    ->select('products.id','products.name','products.is_free_shipping','products.type','products.purchase_price','products.regular_price','products.sell_price','products.image','is_stock','products.category_id','products.discount_type','products.discount','products.after_discount','products.dicount_amount')
-                    ->latest()
-                    ->paginate(24);
-                $view=view('frontend.products.partials.discount', compact('items'))->render();
+        $info = Information::first();
+        $discount_num = $info->discount_num;
 
-                return response()->json(['success'=>true,'html'=>$view]);
-            }
+        $products = Product::with('variation')
+            ->whereNotNull('products.discount_type')
+            ->select('products.id', 'products.name', 'products.is_free_shipping', 'products.type', 'products.purchase_price', 'products.regular_price', 'products.sell_price', 'products.image', 'is_stock', 'products.category_id', 'products.discount_type', 'products.discount', 'products.after_discount', 'products.dicount_amount')
+            ->take($discount_num)->get();
+        $view = view('frontend.products.partials.hotdeal_product', compact('products'))->render();
+        return response()->json(['success' => true, 'html' => $view]);
+
+    }
+
+    public function recommendedProduct()
+    {
+
+        $info = Information::first();
+        $recom_num = $info->recommend_num;
+
+        $products = Product::with('variation')
+            ->whereNull('products.discount_type')
+            ->whereNotNull('products.is_recommended')
+            ->select('products.id', 'products.name', 'products.is_free_shipping', 'products.type', 'products.purchase_price', 'products.regular_price', 'products.sell_price', 'products.image', 'is_stock', 'products.category_id', 'products.discount_type', 'products.discount', 'products.after_discount', 'products.dicount_amount')
+            ->take($recom_num)
+            ->get();
+        $view = view('frontend.products.partials.recommended_product', compact('products'))->render();
+
+        return response()->json(['success' => true, 'html' => $view]);
+
+    }
+
+    public function discountProduct(Request $request)
+    {
+
+        if ($request->ajax()) {
+            $items = Product::with('variation')
+                ->whereNotNull('products.discount_type')
+                ->select('products.id', 'products.name', 'products.is_free_shipping', 'products.type', 'products.purchase_price', 'products.regular_price', 'products.sell_price', 'products.image', 'is_stock', 'products.category_id', 'products.discount_type', 'products.discount', 'products.after_discount', 'products.dicount_amount')
+                ->latest()
+                ->paginate(24);
+            $view = view('frontend.products.partials.discount', compact('items'))->render();
+
+            return response()->json(['success' => true, 'html' => $view]);
+        }
         return view('frontend.products.discount');
 
 
     }
 
-    public function brands(){
-        $items=Type::orderBy('name')->get();
+    public function brands()
+    {
+        $items = Type::orderBy('name')->get();
         return view('frontend.brands', compact('items'));
     }
-    
-     public function landing_page($id)
+
+    public function landing_page($id)
     {
         $ln_pg = LandingPage::with('images')->find($id);
-        $charges=DeliveryCharge::whereNotNull('status')->get();
-        return view('backend.landing_pages.land_page', compact('ln_pg','charges'));
+        $charges = DeliveryCharge::whereNotNull('status')->get();
+        return view('backend.landing_pages.land_page', compact('ln_pg', 'charges'));
     }
-  
-  	
-  	public function subCategories($slug){
-    	
-    
-        $cat=Category::where('url',$slug)->first();
-        $query=Category::whereNotNull('parent_id');
-      				if($cat){ 
-                    	$query->where('parent_id', $cat->id);
-                    }
-        $subs=$query->get();
+
+
+    public function subCategories($slug)
+    {
+
+
+        $cat = Category::where('url', $slug)->first();
+        $query = Category::whereNotNull('parent_id');
+        if ($cat) {
+            $query->where('parent_id', $cat->id);
+        }
+        $subs = $query->get();
 
         return view('frontend.sub_categories', compact('subs'));
-      
-  	}
-    
-    public function categories(){
-        $category_id=request('category_id');
-        $cats=Category::whereNull('parent_id')->get();
-        $query=Category::whereNotNull('parent_id');
-                if(!empty($category_id)){
-                    $query->where('parent_id',$category_id);
-                }
-        $subs=$query->get();
 
-        return view('frontend.categories', compact('cats','subs'));
     }
-    
-    public function free_shipping() {
-        
-        $items=Product::with('variation')
-                ->where('is_free_shipping', 1)
-                ->select('products.id','products.name','products.is_free_shipping','products.type','products.purchase_price','products.regular_price','products.sell_price','products.image','is_stock','products.category_id','products.discount_type','products.discount','products.after_discount','products.dicount_amount')
-                ->latest()
-                ->get();
+
+    public function categories()
+    {
+        $category_id = request('category_id');
+        $cats = Category::whereNull('parent_id')->get();
+        $query = Category::whereNotNull('parent_id');
+        if (!empty($category_id)) {
+            $query->where('parent_id', $category_id);
+        }
+        $subs = $query->get();
+
+        return view('frontend.categories', compact('cats', 'subs'));
+    }
+
+    public function free_shipping()
+    {
+
+        $items = Product::with('variation')
+            ->where('is_free_shipping', 1)
+            ->select('products.id', 'products.name', 'products.is_free_shipping', 'products.type', 'products.purchase_price', 'products.regular_price', 'products.sell_price', 'products.image', 'is_stock', 'products.category_id', 'products.discount_type', 'products.discount', 'products.after_discount', 'products.dicount_amount')
+            ->latest()
+            ->get();
 
         return view('frontend.products.free_shipping_products', compact('items'));
-        
+
     }
-    
+
     // Get The Price Of Variation Product
-    
+
     public function get_variation_price(Request $request)
     {
         $price_value = Variation::find($request->value)->price;
-        
+
         return response()->json([
             'success' => true,
-            'price'  =>  $price_value
+            'price' => $price_value
         ]);
     }
 

@@ -16,8 +16,8 @@
             <h4 class="page-title">Product Create</h4>
         </div>
     </div>
-</div>   
-<!-- end page title --> 
+</div>
+<!-- end page title -->
 
 <div class="row">
     <div class="col-12">
@@ -26,12 +26,12 @@
                 <form method="POST" action="{{ route('admin.products.store')}}" id="ajax_form">
                     @csrf
                     <div class="row">
-                        
+
                         <div class="col-lg-4 mb-3">
                             <label  class="form-label">Product Name</label>
                             <input type="text" name="name" class="form-control" placeholder="Product Name">
                         </div>
-                      
+
                       	<div class="col-lg-4 mb-3">
                             <label  class="form-label">Product Sku</label>
                             <input type="text" name="sku" class="form-control" placeholder="Product Sku">
@@ -77,20 +77,19 @@
                             <label  class="form-label">Sub Category</label>
                             <select class="form-select" name="sub_category_id">
                                 <option value="">Select One</option>
-                                
                             </select>
                         </div>
 
-                        <!--<div class="col-lg-3 mb-3">-->
-                        <!--    <label  class="form-label">Purchase Price</label>-->
-                        <!--    <input type="text" name="purchase_price" class="form-control" placeholder="Productn Purchase Price">-->
-                        <!--</div>-->
+                        <div class="col-lg-3 mb-3">
+                            <label  class="form-label">Purchase Price</label>
+                            <input type="text" name="purchase_price" class="form-control" placeholder="Productn Purchase Price">
+                        </div>
 
                         <div class="col-lg-3 mb-3">
                             <label  class="form-label">Sell Price</label>
                             <input type="text" name="sell_price" class="form-control" placeholder="Productn sell Price">
                         </div>
-                        
+
                         <!--<div class="col-lg-3 mb-3">-->
                         <!--    <label  class="form-label">Regular Price</label>-->
                         <!--    <input type="text" name="regular_price" class="form-control" placeholder="Regular Price">-->
@@ -103,15 +102,24 @@
                                 <option value="variable">Variable</option>
                             </select>
                         </div>
-                        
+
                         <div class="col-lg-3 mb-3">
                             <label  class="form-label">Manage Stock</label>
-                            <select name="is_stock" class="form-control">                                
+                            <select name="is_stock" class="form-control">
                                 <option value="0">No</option>
                               <option value="1">Yes</option>
                             </select>
                         </div>
-                            
+
+                        <div class="col-lg-3 mb-3">
+                            <label  class="form-label">Product Vendor</label>
+                            <select class="form-select" name="vendor_id">
+                                <option value="">Select One</option>
+                                @foreach($vendors as $vendor)
+                                    <option value="{{$vendor->id}}"> {{$vendor->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
                     <hr>
@@ -129,7 +137,7 @@
                                             <th width="5">Action</th>
                                         </tr>
                                     </thead>
-                                    
+
                                     <tbody>
                                         <tr>
                                             <td>
@@ -147,17 +155,17 @@
                                                     @endforeach
                                                 </select>
                                             </td>
-                                            
+
                                             <td>
                                                 <input class="form-control" type="number" name="price[]" placeholder="Price">
                                             </td>
-                                            
+
                                             <td>
                                                 <a class="action-icon btn-primary add_moore"><i class="mdi mdi-plus"></i> </a>
                                             </td>
                                         </tr>
                                     </tbody>
-                                    
+
                                 </table>
                             </div>
                         </div>
@@ -181,16 +189,16 @@
                                 <button type="submit" class="btn btn-primary">Save</button>
                             </div>
                         </div>
-                        
+
                     </div>
 
                 </form>
-       
+
             </div> <!-- end card-body-->
         </div> <!-- end card-->
     </div> <!-- end col -->
 </div> <!-- end row -->
-@endsection 
+@endsection
 
 @push('js')
 <script src="https://cdn.ckeditor.com/4.12.1/standard/ckeditor.js"></script>
@@ -200,7 +208,7 @@
         filebrowserUploadUrl: "{{route('admin.ckeditor.upload', ['_token' => csrf_token() ])}}",
         filebrowserUploadMethod: 'form'
     });
-  
+
   	CKEDITOR.replace('feature', {
         filebrowserUploadUrl: "{{route('admin.ckeditor.upload', ['_token' => csrf_token() ])}}",
         filebrowserUploadMethod: 'form'
@@ -249,7 +257,7 @@
                                 @endforeach
                             </select>
                         </td>
-                        
+
                         <td>
                             <select name="color_id[]" class="form-control">
                                 @foreach($colors as $color)
@@ -271,9 +279,9 @@
 
         $(document).on('click', "a.remove",function(e) {
             var whichtr = $(this).closest("tr");
-            whichtr.remove();      
+            whichtr.remove();
         });
-        
+
         $(document).on('change',"select[name='type']", function(){
             let type=$("select[name='type']").val();
             if(type != 'single')

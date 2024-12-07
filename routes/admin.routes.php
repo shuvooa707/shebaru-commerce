@@ -1,6 +1,8 @@
 <?php
 
 
+use App\Http\Controllers\Backend\FeaturedSliderController;
+use App\Http\Controllers\Backend\VendorController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
@@ -113,6 +115,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth', 'as' => 'admin.'], fu
     Route::get('/popular-category', [CategoryController::class, 'popularCatgeory'])->name('popularCatgeory');
     Route::resource('categories', CategoryController::class);
     Route::resource('sliders', SliderController::class);
+    Route::resource('featured-sliders', FeaturedSliderController::class);
     Route::resource('orders', OrderController::class);
     Route::resource('users', UsersController::class);
     Route::resource('roles', RoleController::class);
@@ -120,6 +123,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth', 'as' => 'admin.'], fu
 
     Route::get('/top-brand-update', [TypeController::class, 'topBrandUpdate'])->name('topBrandUpdate');
     Route::resource('types', TypeController::class);
+    Route::resource('vendors', VendorController::class);
     Route::resource('sizes', SizeController::class);
     Route::resource('purchase', PurchaseController::class);
     Route::resource('about_us', AboutUsController::class);

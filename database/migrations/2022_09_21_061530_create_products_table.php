@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -17,12 +16,21 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->smallInteger('category_id');
-            $table->decimal('purchase_price',8,2)->nullable()->default(0);
-            $table->decimal('sell_price',8,2)->nullable()->default(0);
+            $table->decimal('purchase_price', 8, 2)->nullable()->default(0);
+            $table->decimal('sell_price', 8, 2)->nullable()->default(0);
             $table->string('image')->nullable();
             $table->string('optional_image')->nullable();
             $table->text('description')->nullable();
             $table->longText('body')->nullable();
+
+            $table->unsignedBigInteger("vendor_id")->nullable();
+
+            $table
+                ->foreign("vendor_id")
+                ->references("id")
+                ->on("vendors")
+                ->nullOnDelete();
+
             $table->timestamps();
         });
     }

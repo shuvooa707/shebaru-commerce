@@ -15,7 +15,6 @@ class AuthController extends Controller
 {
     public function sellerRegister()
     {
-
         return view('auth.seller_register');
     }
 
@@ -68,37 +67,25 @@ class AuthController extends Controller
      * @return JsonResponse
      * @method POST
      */
-    public function login(Request $request): JsonResponse
+    public function login(Request $request)
     {
-        $date = date('Y-m-d H:i:s');
-        $date = strtotime($date);
-        $date = strtotime("+3 minute", $date);
-        $new_date = date('Y-m-d H:i:s', $date);
-//        $otp = rand(100000, 999999);
-        $otp = 12345;
-
         $data = request()
-                    ->validate([
-//                        'phone' => 'required|numeric|digits:11|regex:/(01)[0-9]{9}/'
-                        'phone' => 'required'
-                    ]);
+            ->validate([
+                "email" => "required",
+                "password" => "required"
+            ]);
 
-        $data['otp_verify'] = $otp;
-        $data['exp_time'] = $new_date;
-
-        session()->put('user_data', $data);
-        $number = request('phone');
-        $msg = 'Your One-Time PIN is ' . $otp . '. It will expire in 3 minutes.Visit softitsecurity.com';
-        $success = sendSMS($number, $msg);
-        $res = json_decode($success);
-
-        $url = route('front.getOpt');
-
-        if (1 || isset($res->Status) && ($res->Status == '0')) {
-            return response()->json(['success' => true, 'msg' => 'PIN Is Send Please Check Your Phone', 'url' => $url]);
+        if (Auth::attempt($data)) {
+            if (auth()->user()->type == '1') {
+                session()->put('cart', []);
+            }
+            session()->put('user_data', []);
         } else {
-            return response()->json(['success' => false, 'msg' => 'Something Went Wrong . try again Later !']);
+            return redirect()->back();
         }
+
+
+        return redirect("/");
     }
 
     public function getOpt()
@@ -115,10 +102,8 @@ class AuthController extends Controller
 
     public function optVerify()
     {
-
         $user_data = session()->get('user_data');
         date_default_timezone_set("Asia/Dhaka");
-
 
         if (empty($user_data)) {
             return redirect()->route('login');
@@ -177,8 +162,6 @@ class AuthController extends Controller
             } else {
                 return back()->with('error_msg', 'OTP Is Send Check Your Phone');
             }
-
-
         }
     }
 
@@ -192,19 +175,12 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-
-
-        //     $number='01863651124';
-        //   	$message='01863651124';
-
-        //   	$res=SendSms($number,$message);
-        //   	$status=json_decode($res)->status_code;
-
         $request->validate([
             'email' => 'nullable|email|unique:users',
             'username' => 'required|min:6|unique:users',
             'first_name' => 'required',
             'last_name' => 'required',
+            "phone" => "required",
             'password' => 'required|min:6|confirmed',
             'password_confirmation' => 'required',
         ]);

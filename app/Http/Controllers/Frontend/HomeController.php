@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\HomepageFeaturedItem;
+use App\Models\Information;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -32,8 +34,8 @@ class HomeController extends Controller
         $sliders = Slider::latest()->get();
 
         $brands = Type::whereNotNull('is_top')
-            ->take(12)
-            ->get();
+                        ->take(12)
+                        ->get();
 
         $cats = Category::whereNull('parent_id')
                         ->where('is_popular', 1)
@@ -42,7 +44,40 @@ class HomeController extends Controller
 
         $images = HomeSectionImage::all();
 
-        return view('frontend.home', compact('sliders', 'cats', 'brands', 'images'));
+        $featuredItemsIds = HomepageFeaturedItem::all("product_id")
+            ->map(function ($item){
+                return $item->product_id;
+            })->toArray();
+
+        $featuredProducts = Product::whereIn("id", $featuredItemsIds)->get();
+
+//        dd($featuredProducts);
+
+        $info = Information::first();
+
+
+        $curr = $info->currency;
+        $currencySymbol = '';
+        if ($curr == 'BDT') {
+            $currencySymbol = '৳';
+        } elseif ($curr == 'Dollar') {
+            $currencySymbol = '$';
+        } elseif ($curr == 'Euro') {
+            $currencySymbol = '';
+        } elseif ($curr == 'Rupee') {
+            $currencySymbol = '';
+        }
+
+//        dd($info->currency);
+
+        return view('frontend.home', [
+            'sliders' => $sliders,
+            'cats' => $cats,
+            'brands' => $brands,
+            'images' => $images,
+            'featuredProducts' => $featuredProducts,
+            'currencySymbol' => $currencySymbol
+        ]);
     }
 
     public function aboutUs()
